@@ -32,14 +32,14 @@
     - Add protocol distribution and DNS query pattern extraction
     - _Requirements: 2.1, 3.1_
 
-- [ ] 4. Develop baseline management system
-  - [ ] 4.1 Create BaselineManager class with local storage
+- [x] 4. Develop baseline management system
+  - [x] 4.1 Create BaselineManager class with local storage
     - Implement baseline loading and saving to JSON files
     - Create device baseline data structures and validation
     - Add baseline versioning and rollback capabilities
     - _Requirements: 2.1, 2.4, 2.5_
 
-  - [ ] 4.2 Implement dynamic baseline updates
+  - [x] 4.2 Implement dynamic baseline updates
     - Create algorithms for updating baselines from new behavioral data
     - Implement rolling window baseline management (7-day window)
     - Add baseline confidence scoring and adaptation logic
