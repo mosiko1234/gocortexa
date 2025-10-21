@@ -1,102 +1,150 @@
-# Cortexa
-> Intelligent Cyber Security
+# Heimdal Real-time Network Monitoring System
 
-<p align="center">
-  <img src="URL_TO_YOUR_LOGO.png" alt="Cortexa Logo" width="150"/>
-</p>
-<p align="center">
-  <strong>The intelligent immune system for your network.</strong>
-  <br />
-  Cortexa is a next-generation cybersecurity platform that protects connected environments by understanding behavior, not just looking for signatures.
-</p>
+Heimdal is a real-time network monitoring and anomaly detection system that transforms static pcap file analysis into live network traffic monitoring. As the local edge component of the Cortexa hybrid architecture, Heimdal continuously monitors network behavior, maintains local behavioral baselines, detects anomalies, and forwards anonymized metadata to the Asgard cloud platform for global threat intelligence.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/status-in%20stealth-blue.svg" alt="Status" />
-  <img src="https://img.shields.io/badge/version-0.0.1%20(POC)-yellow.svg" alt="Version" />
-  <img src="https://img.shields.io/badge/license-Proprietary-red.svg" alt="License" />
-</p>
+## Project Structure
 
----
+```
+heimdal/
+├── heimdal/                    # Main package directory
+│   ├── __init__.py
+│   ├── main.py                 # Application entry point
+│   ├── models.py               # Core data models
+│   ├── interfaces.py           # Component interfaces
+│   ├── capture/                # Packet capture components
+│   │   └── __init__.py
+│   ├── analysis/               # Real-time analysis components
+│   │   └── __init__.py
+│   ├── baseline/               # Baseline management components
+│   │   └── __init__.py
+│   ├── anomaly/                # Anomaly detection components
+│   │   └── __init__.py
+│   ├── communication/          # Asgard cloud communication
+│   │   └── __init__.py
+│   ├── config/                 # Configuration management
+│   │   ├── __init__.py
+│   │   └── manager.py          # Configuration manager implementation
+│   └── logging/                # Logging and diagnostics
+│       └── __init__.py
+├── config/                     # Configuration files
+│   ├── heimdal.yaml           # YAML configuration template
+│   └── heimdal.json           # JSON configuration template
+├── requirements.txt            # Python dependencies
+├── setup.py                   # Package setup script
+└── README.md                  # This file
+```
 
-## 1. The Problem
+## Features
 
-The average network is no longer just a few computers. It's a complex, chaotic ecosystem of smart TVs, cameras, speakers, locks, and other IoT devices. These devices are notoriously insecure, have no user-facing protection, and create a massive, undefended attack surface for bad actors.
+- **Real-time Packet Capture**: Continuous monitoring of live network traffic
+- **Behavioral Analysis**: Device fingerprinting and behavior pattern extraction
+- **Anomaly Detection**: Real-time comparison against learned baselines
+- **Cloud Integration**: Bidirectional communication with Asgard platform
+- **Data Anonymization**: Privacy-preserving metadata transmission
+- **Configurable Thresholds**: Tunable anomaly detection parameters
+- **Comprehensive Logging**: Detailed system diagnostics and monitoring
 
-Traditional security tools (like anti-virus) are blind to these devices, and legacy firewalls are too complex for the average user. This leaves a critical gap in security, and users have **zero visibility** into what their devices are doing or who they are talking to.
+## Installation
 
-## 2. Our Solution
+1. Install Python dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-**Cortexa** is an autonomous security platform that acts as an **intelligent immune system** for the entire network.
+2. Install the package:
+```bash
+pip install -e .
+```
 
-Instead of relying on outdated signature-based methods (looking for known "viruses"), Cortexa monitors the network, learns the unique **behavioral "DNA"** of every device, and neutralizes threats by detecting anomalous activity.
+## Configuration
 
-It answers the simple question: "Are my devices acting normally?"
+Heimdal supports both YAML and JSON configuration files. Copy and customize one of the templates:
 
-## 3. Core Architecture
+```bash
+cp config/heimdal.yaml /etc/heimdal/config.yaml
+# or
+cp config/heimdal.json /etc/heimdal/config.json
+```
 
-Cortexa is built on a hybrid architecture that combines a powerful local sensor (**Heimdal**) with a global cloud intelligence platform (**Asgard**).
+Key configuration sections:
+- **capture**: Packet capture settings
+- **analysis**: Real-time analysis parameters
+- **anomaly_detection**: Detection thresholds and algorithms
+- **baseline**: Baseline management settings
+- **asgard**: Cloud communication configuration
+- **logging**: System logging configuration
 
-```mermaid
-graph TD
-    subgraph Client Network
-        A(IoT, PCs, Phones) --> B[Heimdal Sensor];
-        B -- 1. Local Analysis & Enforcement --> B;
-        B -- 2. Anonymized Metadata --> C(Asgard Cloud);
-    end
+## Usage
 
-    subgraph Cortexa Cloud
-        C -- 3. Global ML Analysis & Profiling --> C;
-        C -- 5. Intelligence & Signatures --> B;
-        C -- 4. API --> D[User Dashboard / App];
-    end
+### Command Line
 
-    subgraph User
-        D -- 6. View Alerts & Control --> E(User);
-    end
+Run Heimdal with default configuration:
+```bash
+heimdal
+```
 
-    style B fill:#cde4ff
-    style C fill:#d5e8d4
+Run with custom configuration:
+```bash
+heimdal --config /path/to/config.yaml
+```
 
-### Heimdal (The Local Sensor)
+Validate configuration:
+```bash
+heimdal --validate-config --config /path/to/config.yaml
+```
 
-Heimdal is the "guardian" that sits on the user's network. Its job is to see everything and act instantly.
+### Python API
 
-* **Platform:** A lightweight agent, initially deployed on a Raspberry Pi (or similar).
-* **Traffic Interception:** Uses ARP Spoofing to non-intrusively position itself as the network's gateway to monitor all traffic.
-* **Device Fingerprinting:** Intelligently identifies every device on the network (e.g., "iPhone 15 Pro", "Samsung Smart TV", "TP-Link Camera").
-* **Local Baselining:** Learns the normal behavior of the local network ("What is normal for *this* network?").
-* **Enforcement:** Can instantly block or quarantine a device if it detects a critical anomaly.
-* **Reporting:** Sends anonymized metadata (e.g., "A 'Samsung Smart TV' talked to a new server in Russia") to Asgard for deeper analysis.
+```python
+from heimdal.main import HeimdallApplication
 
-### Asgard (The Global Brain)
+# Create and start the application
+app = HeimdallApplication("config/heimdal.yaml")
+app.start()
 
-Asgard is the central cloud platform that aggregates data from all Heimdal sensors to become smarter over time. This is our core competitive advantage (Network Effect).
+# Keep running until stopped
+app.run()
+```
 
-* **Collective Intelligence:** Ingests anonymized metadata from thousands of networks.
-* **"Golden Profile" Generation:** By analyzing 100,000 "Samsung Smart TVs," Asgard builds a statistically perfect behavioral model ("Golden Profile") of what that device should *ever* be allowed to do.
-* **Zero-Day Threat Detection:** Uses Machine Learning to identify new attack patterns as they emerge across the globe.
-* **Intelligence Distribution:** Pushes new rules, signatures, and "vaccines" back to every Heimdal sensor, protecting all users from threats seen by even one.
+## Requirements
 
-## 4. Project Goals
+- Python 3.8 or higher
+- Root privileges for packet capture
+- Network interface access
+- Sufficient disk space for baseline storage and logs
 
-* **Simplicity:** Create a "zero configuration" security product that is accessible to everyone.
-* **Visibility:** Turn the "black box" of the network into a simple, understandable dashboard.
-* **Proactive Protection:** Move from reactive (signature-based) to proactive (behavior-based) security.
-* **Scalability:** Build a platform that can protect home networks, small businesses, and eventually enterprise IoT.
+### System Dependencies
 
-## 5. Current Status
+- **scapy**: Packet capture and analysis
+- **pyyaml**: YAML configuration support
+- **requests**: HTTP communication with Asgard
+- **python-dateutil**: Date/time handling
 
-**Phase 1: Proof of Concept (POC) - In Progress**
+### Optional Dependencies
 
-* [x] Setup Raspberry Pi 5 as a base sensor.
-* [x] Successfully intercept local network traffic (ARP Spoofing).
-* [x] Capture traffic to a static `pcap` file.
-* [x] **Core Milestone:** Write basic Python scripts (`scapy`) to:
-    * [x] Read `pcap` files.
-    * [x] Generate a `baseline.json` file (the "normal" state).
-    * [x] Monitor a *new* `pcap` file and detect anomalies by comparing it to the baseline.
-* [ ] **Next Step:** Move from static `pcap` analysis to real-time, live packet monitoring.
+- **psutil**: System performance monitoring
+- **geoip2**: IP geolocation (requires MaxMind database)
+- **cryptography**: Enhanced security features
 
-## 6. Getting Started
+## Architecture
 
-(Instructions to be added once the POC is more mature.)
+Heimdal follows a modular architecture with clear interfaces between components:
+
+1. **Packet Capture Engine**: Captures live network packets
+2. **Real-time Analyzer**: Extracts behavioral features from packets
+3. **Baseline Manager**: Maintains device behavioral baselines
+4. **Anomaly Detector**: Compares behavior against baselines
+5. **Asgard Communicator**: Handles cloud communication
+6. **Configuration Manager**: Manages system configuration
+
+## Development Status
+
+This project is currently in development. The core interfaces and data models have been established, and individual components are being implemented according to the specification.
+
+## License
+
+MIT License - see LICENSE file for details.
+
+## Support
+
+For support and documentation, visit: https://docs.cortexa.ai/heimdal

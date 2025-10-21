@@ -1,0 +1,17 @@
+# Core dependencies for Heimdal real-time monitoring
+scapy>=2.5.0
+pyyaml>=6.0
+requests>=2.28.0
+python-dateutil>=2.8.0
+
+# Optional dependencies for enhanced functionality
+psutil>=5.9.0  # System performance monitoring
+geoip2>=4.6.0  # IP geolocation (requires MaxMind database)
+cryptography>=3.4.0  # Data encryption and security
+
+# Development dependencies (uncomment for development)
+# pytest>=7.0.0
+# pytest-asyncio>=0.21.0
+# black>=22.0.0
+# flake8>=5.0.0
+# mypy>=1.0.0

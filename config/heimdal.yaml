@@ -1,0 +1,60 @@
+# Heimdal Real-time Network Monitoring Configuration
+
+# Packet capture settings
+capture:
+  interface: "eth0"  # Network interface to monitor
+  filter_expression: null  # Optional BPF filter expression
+  max_packet_buffer_size: 10000  # Maximum packets to buffer
+  capture_timeout: 1.0  # Capture timeout in seconds
+
+# Real-time analysis settings
+analysis:
+  processing_batch_size: 100  # Packets to process in each batch
+  device_timeout_seconds: 300  # Timeout for inactive devices
+  feature_extraction_interval: 60  # Seconds between feature extraction
+
+# Anomaly detection configuration
+anomaly_detection:
+  thresholds:
+    new_destination: 0.7  # Threshold for new destination anomalies
+    unusual_volume: 0.8  # Threshold for traffic volume anomalies
+    protocol_violation: 0.9  # Threshold for protocol violations
+    timing_anomaly: 0.6  # Threshold for timing anomalies
+    geolocation_violation: 0.85  # Threshold for geolocation violations
+  baseline_update_frequency: 60  # Seconds between baseline updates
+  anomaly_correlation_window: 300  # Seconds to correlate related anomalies
+
+# Baseline management settings
+baseline:
+  rolling_window_days: 7  # Days of behavior to maintain in baseline
+  max_baseline_age_days: 30  # Maximum age before baseline cleanup
+  confidence_threshold: 0.5  # Minimum confidence for baseline updates
+  auto_save_interval: 300  # Seconds between automatic baseline saves
+
+# Asgard cloud communication
+asgard:
+  api_endpoint: "https://api.asgard.cortexa.ai"
+  api_key: ""  # Your Asgard API key (set via environment variable)
+  retry_attempts: 3  # Number of retry attempts for failed requests
+  retry_backoff_seconds: 5  # Seconds to wait between retries
+  connection_timeout: 30  # Connection timeout in seconds
+  metadata_queue_size: 1000  # Maximum queued metadata items
+
+# Logging configuration
+logging:
+  level: "INFO"  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file_path: "/var/log/heimdal/heimdal.log"  # Log file path
+  max_file_size_mb: 100  # Maximum log file size in MB
+  backup_count: 5  # Number of backup log files to keep
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# System settings
+system:
+  sensor_id: ""  # Unique sensor identifier (auto-generated if empty)
+  location: ""  # Sensor location description
+  capabilities:
+    - "packet_capture"
+    - "anomaly_detection"
+    - "baseline_management"
+  performance_monitoring: true  # Enable performance monitoring
+  health_check_interval: 60  # Seconds between health checks
