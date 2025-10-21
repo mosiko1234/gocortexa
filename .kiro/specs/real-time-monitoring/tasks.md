@@ -58,20 +58,20 @@
     - Create alert filtering to prevent notification spam
     - _Requirements: 3.2, 3.3, 3.4_
 
-- [ ] 6. Implement Asgard cloud communication
-  - [ ] 6.1 Create AsgardCommunicator class with API client
+- [x] 6. Implement Asgard cloud communication
+  - [x] 6.1 Create AsgardCommunicator class with API client
     - Implement HTTP client for Asgard API communication
     - Add sensor registration and authentication with Asgard
     - Create retry logic and offline queuing for API failures
     - _Requirements: 5.4, 6.1_
 
-  - [ ] 6.2 Implement data anonymization for cloud transmission
+  - [x] 6.2 Implement data anonymization for cloud transmission
     - Create anonymization functions for IP addresses, MAC addresses, and device info
     - Implement behavioral signature generation while preserving privacy
     - Add anonymized metadata transmission to Asgard
     - _Requirements: 5.1, 5.2, 5.5_
 
-  - [ ] 6.3 Add intelligence reception from Asgard
+  - [x] 6.3 Add intelligence reception from Asgard
     - Implement API endpoints to receive threat intelligence updates
     - Create Golden Profile integration into local baselines
     - Add threat signature updates and enforcement rule distribution
