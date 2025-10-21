@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Optional
 
 from .config.manager import ConfigurationManager
+from .orchestrator import MonitoringOrchestrator
 from .interfaces import IMonitoringOrchestrator
 
 
@@ -42,13 +43,15 @@ class HeimdallApplication:
             
             print("Starting Heimdal real-time monitoring system...")
             
-            # TODO: Initialize orchestrator when implemented
-            # self.orchestrator = MonitoringOrchestrator(self.config_manager)
-            # return self.orchestrator.start()
+            # Initialize and start orchestrator
+            self.orchestrator = MonitoringOrchestrator(self.config_manager)
+            success = self.orchestrator.start()
             
-            self._running = True
-            print("Heimdal system started successfully")
-            return True
+            if success:
+                self._running = True
+                print("Heimdal system started successfully")
+            
+            return success
             
         except Exception as e:
             print(f"Failed to start Heimdal system: {e}")
@@ -58,11 +61,13 @@ class HeimdallApplication:
         """Stop the Heimdal monitoring system"""
         try:
             if self.orchestrator:
-                self.orchestrator.stop()
+                success = self.orchestrator.stop()
+            else:
+                success = True
             
             self._running = False
             print("Heimdal system stopped")
-            return True
+            return success
             
         except Exception as e:
             print(f"Error stopping Heimdal system: {e}")
@@ -70,6 +75,8 @@ class HeimdallApplication:
     
     def is_running(self) -> bool:
         """Check if the system is running"""
+        if self.orchestrator:
+            return self.orchestrator.is_running()
         return self._running
     
     def run(self) -> None:
@@ -102,8 +109,34 @@ def main():
         action="store_true",
         help="Validate configuration and exit"
     )
+    parser.add_argument(
+        "--create-config",
+        type=str,
+        metavar="PATH",
+        help="Create a default configuration file at the specified path"
+    )
+    parser.add_argument(
+        "--status",
+        action="store_true",
+        help="Show system status (requires running instance)"
+    )
+    parser.add_argument(
+        "--enable-auto-reload",
+        action="store_true",
+        help="Enable automatic configuration reload on file changes"
+    )
     
     args = parser.parse_args()
+    
+    # Create default configuration if requested
+    if args.create_config:
+        config_manager = ConfigurationManager()
+        if config_manager.export_config_template(args.create_config):
+            print(f"Default configuration created at: {args.create_config}")
+            sys.exit(0)
+        else:
+            print("Failed to create configuration file")
+            sys.exit(1)
     
     # Validate configuration if requested
     if args.validate_config:
@@ -119,8 +152,19 @@ def main():
             print("Configuration is valid")
             sys.exit(0)
     
+    # Show status if requested (this would need IPC in a real implementation)
+    if args.status:
+        print("Status checking not implemented in this version")
+        print("This would require inter-process communication with a running instance")
+        sys.exit(0)
+    
     # Run the application
     app = HeimdallApplication(args.config)
+    
+    # Enable auto-reload if requested
+    if args.enable_auto_reload:
+        app.config_manager.enable_auto_reload()
+    
     app.run()
 
 
