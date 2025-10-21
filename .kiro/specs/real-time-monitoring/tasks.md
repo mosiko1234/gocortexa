@@ -45,14 +45,14 @@
     - Add baseline confidence scoring and adaptation logic
     - _Requirements: 2.1, 2.3, 2.4_
 
-- [ ] 5. Build anomaly detection engine
-  - [ ] 5.1 Implement core anomaly detection algorithms
+- [x] 5. Build anomaly detection engine
+  - [x] 5.1 Implement core anomaly detection algorithms
     - Create anomaly scoring algorithms comparing behavior to baselines
     - Implement different anomaly types (new destinations, volume, timing)
     - Add configurable threshold management for anomaly detection
     - _Requirements: 3.1, 3.2, 4.2_
 
-  - [ ] 5.2 Create alert generation and correlation
+  - [x] 5.2 Create alert generation and correlation
     - Implement alert generation with severity levels and descriptions
     - Add anomaly correlation to group related incidents
     - Create alert filtering to prevent notification spam
