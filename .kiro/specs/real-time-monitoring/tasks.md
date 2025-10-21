@@ -6,14 +6,14 @@
   - Set up configuration management system with YAML/JSON config files
   - _Requirements: 4.1, 4.4_
 
-- [ ] 2. Implement packet capture engine for live monitoring
-  - [ ] 2.1 Create PacketCaptureEngine class with scapy AsyncSniffer
+- [x] 2. Implement packet capture engine for live monitoring
+  - [x] 2.1 Create PacketCaptureEngine class with scapy AsyncSniffer
     - Implement non-blocking packet capture using scapy's AsyncSniffer
     - Add packet buffering mechanism to handle burst traffic
     - Create packet stream iterator interface for real-time processing
     - _Requirements: 1.1, 1.3, 1.4_
 
-  - [ ] 2.2 Add capture statistics and monitoring
+  - [x] 2.2 Add capture statistics and monitoring
     - Implement packet counting, processing rates, and drop detection
     - Add performance metrics logging for capture engine
     - Create graceful shutdown mechanism for packet capture
