@@ -1,0 +1,49 @@
+[Unit]
+Description=Heimdal Real-time Network Monitoring Service
+Documentation=https://docs.cortexa.ai/heimdal
+After=network.target network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=heimdal
+Group=heimdal
+WorkingDirectory=/opt/heimdal
+Environment=PYTHONPATH=/opt/heimdal
+Environment=HEIMDAL_CONFIG_PATH=/etc/heimdal/heimdal.yaml
+ExecStart=/opt/heimdal/venv/bin/python -m heimdal.main --config /etc/heimdal/heimdal.yaml
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=heimdal
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/heimdal /var/lib/heimdal
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictNamespaces=true
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+# Network capabilities for packet capture
+AmbientCapabilities=CAP_NET_RAW CAP_NET_ADMIN
+CapabilityBoundingSet=CAP_NET_RAW CAP_NET_ADMIN
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target

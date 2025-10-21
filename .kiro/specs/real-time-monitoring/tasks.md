@@ -129,14 +129,14 @@
     - Add performance tests to validate latency and throughput requirements
     - _Requirements: 1.3, 3.2, 5.4_
 
-- [ ] 11. Integration and system testing
-  - [ ] 11.1 Integrate all components into working system
+- [-] 11. Integration and system testing
+  - [x] 11.1 Integrate all components into working system
     - Wire together all components through main application orchestrator
     - Test complete packet capture → analysis → anomaly detection → cloud communication flow
     - Validate system performance meets requirements on Raspberry Pi hardware
     - _Requirements: All requirements integration_
 
-  - [ ] 11.2 Create deployment and installation scripts
+  - [x] 11.2 Create deployment and installation scripts
     - Write installation scripts for Raspberry Pi deployment
     - Create systemd service files for automatic startup
     - Add configuration templates and setup documentation

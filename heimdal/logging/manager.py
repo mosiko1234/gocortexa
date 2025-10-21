@@ -16,6 +16,8 @@ import json
 import threading
 import time
 
+from ..interfaces import ILogger
+
 
 class StructuredFormatter(logging.Formatter):
     """
@@ -51,7 +53,7 @@ class StructuredFormatter(logging.Formatter):
         return json.dumps(log_entry)
 
 
-class LoggingManager:
+class LoggingManager(ILogger):
     """
     Centralized logging manager that handles configuration, rotation, and disk space management.
     """
@@ -298,6 +300,32 @@ class LoggingManager:
                 })
         
         return stats
+    
+    # ILogger interface implementation
+    def debug(self, message: str, **kwargs) -> None:
+        """Log debug message"""
+        logger = logging.getLogger()
+        logger.debug(message, extra=kwargs)
+    
+    def info(self, message: str, **kwargs) -> None:
+        """Log info message"""
+        logger = logging.getLogger()
+        logger.info(message, extra=kwargs)
+    
+    def warning(self, message: str, **kwargs) -> None:
+        """Log warning message"""
+        logger = logging.getLogger()
+        logger.warning(message, extra=kwargs)
+    
+    def error(self, message: str, **kwargs) -> None:
+        """Log error message"""
+        logger = logging.getLogger()
+        logger.error(message, extra=kwargs)
+    
+    def critical(self, message: str, **kwargs) -> None:
+        """Log critical message"""
+        logger = logging.getLogger()
+        logger.critical(message, extra=kwargs)
     
     def shutdown(self):
         """Shutdown the logging manager and cleanup resources."""

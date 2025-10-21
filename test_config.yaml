@@ -1,0 +1,45 @@
+# Test configuration for integration validation
+system:
+  sensor_id: "test-sensor-001"
+  location: "test-environment"
+  capabilities: ["packet_capture", "anomaly_detection"]
+  health_check_interval: 60
+
+capture:
+  interface: "lo"  # Use loopback interface for testing
+  filter_expression: ""
+  buffer_size: 1000
+  timeout: 1.0
+  local_networks: ["192.168.0.0/16", "10.0.0.0/8", "127.0.0.0/8"]
+
+logging:
+  level: "INFO"
+  directory: "./logs"
+  max_file_size: 10485760  # 10MB
+  backup_count: 5
+  enable_console: true
+  enable_structured: true
+
+baseline:
+  directory: "./data/baselines"
+  auto_save_interval: 300
+  max_versions: 10
+  confidence_threshold: 0.7
+  update_frequency: 60
+
+anomaly_detection:
+  thresholds:
+    new_destination: 0.8
+    traffic_volume: 0.7
+    protocol_anomaly: 0.9
+    timing_anomaly: 0.6
+  correlation_window: 300
+  max_alerts_per_hour: 100
+
+asgard:
+  api_endpoint: "https://api.asgard.test"
+  api_key: "test-key"
+  retry_attempts: 3
+  retry_delay: 5
+  queue_size: 1000
+  batch_size: 50

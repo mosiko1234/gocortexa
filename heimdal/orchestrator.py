@@ -241,7 +241,17 @@ class MonitoringOrchestrator(IMonitoringOrchestrator):
         """Initialize logging system"""
         try:
             self._update_component_status("logger", "starting")
-            self.logger = LoggingManager(self.config_manager)
+            log_dir = self.config_manager.get_config("logging.directory", "./logs")
+            log_level = self.config_manager.get_config("logging.level", "INFO")
+            max_file_size = self.config_manager.get_config("logging.max_file_size", 10485760)
+            backup_count = self.config_manager.get_config("logging.backup_count", 5)
+            
+            self.logger = LoggingManager(
+                log_dir=log_dir,
+                log_level=log_level,
+                max_file_size=max_file_size,
+                backup_count=backup_count
+            )
             self._update_component_status("logger", "running")
             return True
         except Exception as e:
@@ -254,35 +264,35 @@ class MonitoringOrchestrator(IMonitoringOrchestrator):
         try:
             # Initialize baseline manager first (needed by other components)
             self._update_component_status("baseline_manager", "starting")
-            self.baseline_manager = BaselineManager(self.config_manager, self.logger)
+            baseline_dir = self.config_manager.get_config("baseline.directory", "./data/baselines")
+            max_versions = self.config_manager.get_config("baseline.max_versions", 10)
+            self.baseline_manager = BaselineManager(baseline_dir, max_versions)
             if not self.baseline_manager.load_baselines():
-                self.logger.warning("Failed to load existing baselines, starting fresh")
+                if self.logger:
+                    self.logger.warning("Failed to load existing baselines, starting fresh")
             self._update_component_status("baseline_manager", "running")
             
             # Initialize anomaly detector
             self._update_component_status("anomaly_detector", "starting")
-            self.anomaly_detector = AnomalyDetector(self.config_manager, self.logger)
+            self.anomaly_detector = AnomalyDetector(self.baseline_manager)
             self._update_component_status("anomaly_detector", "running")
             
             # Initialize Asgard communicator
             self._update_component_status("asgard_communicator", "starting")
-            self.asgard_communicator = AsgardCommunicator(self.config_manager, self.logger)
+            api_endpoint = self.config_manager.get_config("asgard.api_endpoint")
+            api_key = self.config_manager.get_config("asgard.api_key")
+            self.asgard_communicator = AsgardCommunicator(api_endpoint, api_key)
             self._update_component_status("asgard_communicator", "running")
             
             # Initialize real-time analyzer
             self._update_component_status("analyzer", "starting")
-            self.analyzer = RealtimeAnalyzer(
-                self.config_manager, 
-                self.baseline_manager,
-                self.anomaly_detector,
-                self.asgard_communicator,
-                self.logger
-            )
+            local_networks = self.config_manager.get_config("capture.local_networks", ["192.168.0.0/16", "10.0.0.0/8"])
+            self.analyzer = RealtimeAnalyzer(local_networks)
             self._update_component_status("analyzer", "running")
             
             # Initialize packet capture engine last
             self._update_component_status("capture_engine", "starting")
-            self.capture_engine = PacketCaptureEngine(self.config_manager, self.logger)
+            self.capture_engine = PacketCaptureEngine()
             
             # Start packet capture
             interface = self.config_manager.get_config("capture.interface")
@@ -296,7 +306,10 @@ class MonitoringOrchestrator(IMonitoringOrchestrator):
             return True
             
         except Exception as e:
-            self.logger.error(f"Failed to initialize components: {e}")
+            if self.logger:
+                self.logger.error(f"Failed to initialize components: {e}")
+            else:
+                print(f"Failed to initialize components: {e}")
             return False
     
     def _shutdown_components(self) -> None:

@@ -1,0 +1,30 @@
+{
+  "version": "2025-10-22T00:52:23.261812",
+  "baselines": {
+    "test_device_123": {
+      "device_id": "test_device_123",
+      "device_type": "unknown",
+      "normal_destinations": [
+        "8.8.8.8"
+      ],
+      "normal_ports": [
+        443
+      ],
+      "traffic_patterns": {
+        "peak_hours": [
+          0
+        ],
+        "average_session_duration": 30.0,
+        "typical_destinations": [
+          "8.8.8.8"
+        ],
+        "common_ports": [
+          443
+        ]
+      },
+      "last_updated": "2025-10-22T00:52:23.261325",
+      "confidence_score": 0.22919375945154102,
+      "global_profile_version": ""
+    }
+  }
+}
