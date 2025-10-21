@@ -7,6 +7,7 @@ watchdog>=3.0.0  # Configuration file monitoring
 
 # Optional dependencies for enhanced functionality
 psutil>=5.9.0  # System performance monitoring
+netifaces>=0.11.0  # Network interface discovery and validation
 geoip2>=4.6.0  # IP geolocation (requires MaxMind database)
 cryptography>=3.4.0  # Data encryption and security
 

@@ -377,7 +377,7 @@ class MonitoringOrchestrator(IMonitoringOrchestrator):
                 time.sleep(check_interval)
     
     def _perform_health_checks(self) -> None:
-        """Perform health checks on all components"""
+        """Perform comprehensive health checks on all components with enhanced error handling"""
         current_time = datetime.now()
         
         # Update heartbeats for running components
@@ -385,25 +385,114 @@ class MonitoringOrchestrator(IMonitoringOrchestrator):
             if status.status == "running":
                 status.last_heartbeat = current_time
         
-        # Check capture engine statistics
-        if self.capture_engine and self.capture_engine.is_capturing():
-            stats = self.capture_engine.get_capture_statistics()
-            if stats.dropped_packets > 0:
-                self.logger.warning(f"Packet capture dropping packets: {stats.dropped_packets}")
+        # Enhanced capture engine health checks
+        if self.capture_engine:
+            try:
+                if self.capture_engine.is_capturing():
+                    stats = self.capture_engine.get_capture_statistics()
+                    
+                    # Check for packet drops
+                    if stats.packets_dropped > 0:
+                        drop_rate = (stats.packets_dropped / max(stats.packets_captured, 1)) * 100
+                        if drop_rate > 5.0:  # More than 5% drop rate is concerning
+                            self.logger.warning(f"High packet drop rate: {drop_rate:.2f}% ({stats.packets_dropped}/{stats.packets_captured})")
+                    
+                    # Check for errors
+                    if stats.errors > 0:
+                        self.logger.warning(f"Packet capture errors detected: {stats.errors}")
+                    
+                    # Check recovery status
+                    if hasattr(self.capture_engine, 'get_recovery_status'):
+                        recovery_status = self.capture_engine.get_recovery_status()
+                        if recovery_status['consecutive_errors'] > 0:
+                            self.logger.warning(f"Capture engine has {recovery_status['consecutive_errors']} consecutive errors")
+                            
+                            # Attempt component restart if too many errors
+                            if recovery_status['consecutive_errors'] >= 3:
+                                self.logger.info("Attempting to restart capture engine due to errors")
+                                self.restart_component("capture_engine")
+                
+                else:
+                    # Capture engine should be running but isn't
+                    self.logger.warning("Capture engine is not capturing, attempting restart")
+                    self.restart_component("capture_engine")
+                    
+            except Exception as e:
+                self.logger.error(f"Error during capture engine health check: {e}")
+                self._update_component_status("capture_engine", "error", str(e))
         
-        # Check Asgard connectivity
-        if self.asgard_communicator and not self.asgard_communicator.is_connected():
-            self.logger.warning("Lost connection to Asgard cloud platform")
+        # Enhanced Asgard connectivity checks
+        if self.asgard_communicator:
+            try:
+                if hasattr(self.asgard_communicator, 'get_enhanced_status'):
+                    asgard_status = self.asgard_communicator.get_enhanced_status()
+                    
+                    # Check connection state
+                    if asgard_status['connection_state'] != 'connected':
+                        self.logger.warning(f"Asgard connection state: {asgard_status['connection_state']}")
+                        
+                        # Force reconnect if too many consecutive failures
+                        if asgard_status['consecutive_failures'] >= 5:
+                            self.logger.info("Forcing Asgard reconnection due to consecutive failures")
+                            if hasattr(self.asgard_communicator, 'force_reconnect'):
+                                self.asgard_communicator.force_reconnect()
+                    
+                    # Check queue status
+                    queue_size = asgard_status['queue_size']
+                    if queue_size > self.asgard_communicator.max_queue_size * 0.8:  # 80% full
+                        self.logger.warning(f"Asgard queue is {queue_size}/{self.asgard_communicator.max_queue_size} full")
+                    
+                    # Log metrics periodically
+                    if hasattr(self, '_last_metrics_log'):
+                        if (current_time - self._last_metrics_log).total_seconds() > 300:  # Every 5 minutes
+                            metrics = asgard_status['metrics']
+                            self.logger.info(f"Asgard communication metrics: {metrics}")
+                            self._last_metrics_log = current_time
+                    else:
+                        self._last_metrics_log = current_time
+                
+                elif not self.asgard_communicator.is_connected():
+                    self.logger.warning("Lost connection to Asgard cloud platform")
+                    
+            except Exception as e:
+                self.logger.error(f"Error during Asgard health check: {e}")
+                self._update_component_status("asgard_communicator", "error", str(e))
         
-        # Save baselines periodically
+        # Enhanced baseline manager checks
         if self.baseline_manager:
-            save_interval = self.config_manager.get_config("baseline.auto_save_interval", 300)
-            if hasattr(self, '_last_baseline_save'):
-                if (current_time - self._last_baseline_save).total_seconds() > save_interval:
-                    self.baseline_manager.save_baselines()
+            try:
+                save_interval = self.config_manager.get_config("baseline.auto_save_interval", 300)
+                if hasattr(self, '_last_baseline_save'):
+                    if (current_time - self._last_baseline_save).total_seconds() > save_interval:
+                        if self.baseline_manager.save_baselines():
+                            self._last_baseline_save = current_time
+                        else:
+                            self.logger.warning("Failed to save baselines during health check")
+                else:
                     self._last_baseline_save = current_time
-            else:
-                self._last_baseline_save = current_time
+                    
+            except Exception as e:
+                self.logger.error(f"Error during baseline manager health check: {e}")
+                self._update_component_status("baseline_manager", "error", str(e))
+        
+        # Check system resources
+        try:
+            import psutil
+            
+            # Check memory usage
+            memory = psutil.virtual_memory()
+            if memory.percent > 90:
+                self.logger.warning(f"High memory usage: {memory.percent}%")
+            
+            # Check disk usage
+            disk = psutil.disk_usage('/')
+            if disk.percent > 90:
+                self.logger.warning(f"High disk usage: {disk.percent}%")
+                
+        except ImportError:
+            pass  # psutil not available
+        except Exception as e:
+            self.logger.debug(f"Error checking system resources: {e}")
     
     def _update_component_status(self, component_name: str, status: str, error_message: Optional[str] = None) -> None:
         """Update component status"""
