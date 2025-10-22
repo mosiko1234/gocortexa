@@ -20,6 +20,9 @@ HEIMDAL_LOG_DIR="/var/log/heimdal"
 HEIMDAL_DATA_DIR="/var/lib/heimdal"
 PYTHON_VERSION="3.9"
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+PROJECT_ROOT=$( dirname "$SCRIPT_DIR" )
+
 # Functions
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -122,7 +125,7 @@ create_user() {
 
 create_directories() {
     log_info "Creating directory structure..."
-    
+
     # Create directories
     mkdir -p "$HEIMDAL_HOME"
     mkdir -p "$HEIMDAL_CONFIG_DIR"
@@ -130,19 +133,23 @@ create_directories() {
     mkdir -p "$HEIMDAL_DATA_DIR"
     mkdir -p "$HEIMDAL_DATA_DIR/baselines"
     mkdir -p "$HEIMDAL_DATA_DIR/cache"
-    
+
+    log_info "Copying application files to $HEIMDAL_HOME..."
+    # Copy all project files from the source to the application home
+    cp -a "$PROJECT_ROOT/." "$HEIMDAL_HOME/"
+
     # Set ownership
     chown -R "$HEIMDAL_USER:$HEIMDAL_USER" "$HEIMDAL_HOME"
     chown -R "$HEIMDAL_USER:$HEIMDAL_USER" "$HEIMDAL_LOG_DIR"
     chown -R "$HEIMDAL_USER:$HEIMDAL_USER" "$HEIMDAL_DATA_DIR"
-    
+
     # Set permissions
     chmod 755 "$HEIMDAL_HOME"
     chmod 755 "$HEIMDAL_CONFIG_DIR"
     chmod 755 "$HEIMDAL_LOG_DIR"
     chmod 755 "$HEIMDAL_DATA_DIR"
-    
-    log_success "Directory structure created"
+
+    log_success "Directory structure and files created"
 }
 
 install_heimdal() {
