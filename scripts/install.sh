@@ -185,8 +185,6 @@ setup_configuration() {
     chmod 644 "$HEIMDAL_CONFIG_DIR/heimdal.yaml"
     chmod 644 "$HEIMDAL_CONFIG_DIR/heimdal.json"
     
-    # Update configuration for system paths
-    sed -i "s|/var/log/heimdal/heimdal.log|$HEIMDAL_LOG_DIR/heimdal.log|g" "$HEIMDAL_CONFIG_DIR/heimdal.yaml"
     
     log_success "Configuration files installed"
 }
