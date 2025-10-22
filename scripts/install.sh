@@ -97,7 +97,8 @@ install_system_dependencies() {
     # Install additional packages for Raspberry Pi
     if [[ $IS_RASPBERRY_PI -eq 1 ]]; then
         apt-get install -y \
-            libraspberrypi-bin \
+            raspi-utils-dt \
+            raspi-utils-core \
             rpi-update
     fi
     
