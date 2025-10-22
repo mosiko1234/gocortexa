@@ -154,17 +154,19 @@ create_directories() {
 
 install_heimdal() {
     log_info "Installing Heimdal application..."
-    
+
     # Create virtual environment
     sudo -u "$HEIMDAL_USER" python3 -m venv "$HEIMDAL_HOME/venv"
-    
+
     # Activate virtual environment and install
+    # We MUST change directory (cd) to $HEIMDAL_HOME before running pip
     sudo -u "$HEIMDAL_USER" bash -c "
-        source '$HEIMDAL_HOME/venv/bin/activate'
-        pip install --upgrade pip setuptools wheel
+        cd '$HEIMDAL_HOME' &&
+        source '$HEIMDAL_HOME/venv/bin/activate' &&
+        pip install --upgrade pip setuptools wheel &&
         pip install -e .
     "
-    
+
     log_success "Heimdal application installed"
 }
 
