@@ -234,7 +234,8 @@ setup_network_permissions() {
     
     # Allow heimdal user to capture packets without root
     # This uses capabilities instead of running as root
-    setcap cap_net_raw,cap_net_admin=eip "$HEIMDAL_HOME/venv/bin/python3"
+    PYTHON_EXEC_PATH=$(readlink -f "$HEIMDAL_HOME/venv/bin/python3")
+    setcap cap_net_raw,cap_net_admin=eip "$PYTHON_EXEC_PATH"
     
     # Alternative: Add to sudoers for specific commands (commented out)
     # echo "$HEIMDAL_USER ALL=(ALL) NOPASSWD: /usr/sbin/tcpdump" >> /etc/sudoers.d/heimdal
